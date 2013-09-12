@@ -7,7 +7,6 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.ScreenWriter;
 import de.dhiller.termtris.tile.Tile;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -28,10 +27,17 @@ public class Map {
         for (int row = 0 ; row < 20 ; row++ ) {
             String line = (row<19?DEFAULT_MAP_BORDER:DEFAULT_MAP_BOTTOM_BORDER);
             for (Element e : getElementsOnRow(row)) {
-                String s = e.lineFromTile(row);
-                for (int lineColIndex = 1 + e.getCoordinate().y; lineColIndex < s.length(); lineColIndex++) {
-
+                String lineOfTile = e.lineFromTile(row);
+                int lineColIndex = 1 + e.getCoordinate().y;
+                StringBuilder builder = new StringBuilder();
+                builder.append(line);
+                for (char c : lineOfTile.toCharArray()) {
+                    if (c != " ".charAt(0)) {
+                        builder.replace(lineColIndex,lineColIndex+1,"x");
+                    }
+                    lineColIndex++;
                 }
+                line = builder.toString();
             }
             writer.drawString(0, row, line);
         }
@@ -45,14 +51,12 @@ public class Map {
     public List<Element> getElementsOnRow(final int row) {
         return ImmutableList.copyOf(Collections2.filter(elements, new Predicate<Element>() {
             @Override
-            public boolean apply(@Nonnull Element input) {
+            public boolean apply(Element input) {
                 Element element = checkNotNull(input);
                 if(row < element.getCoordinate().x)
                     return false;
                 Tile tile = element.tile();
-                if(row >= tile.getLines().size())
-                    return false;
-                return element.lineFromTile(row).contains("x");
+                return row < tile.getLines().size() && element.lineFromTile(row).contains("x");
             }
         }));
     }

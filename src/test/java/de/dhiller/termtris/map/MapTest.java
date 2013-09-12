@@ -4,7 +4,6 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.TerminalSize;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -19,7 +18,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -65,7 +63,7 @@ public class MapTest {
     public void getElementsForRowWithTile1FacingEast() {
         Element element = new Element(0, new Point(0, 0), Orientation.EAST);
         underTest.addElement(element);
-        assertThat(underTest.getElementsOnRow(0).isEmpty(),is(true));
+        assertThat(underTest.getElementsOnRow(0).isEmpty(), is(true));
         assertThat(underTest.getElementsOnRow(1),contains(element));
         assertThat(underTest.getElementsOnRow(2).isEmpty(),is(true));
         assertThat(underTest.getElementsOnRow(3).isEmpty(),is(true));
@@ -73,14 +71,22 @@ public class MapTest {
 
     @Test
     public void drawMapWithOneElement() throws IOException {
-        underTest.addElement(new Element(0,new Point(0,0),Orientation.NORTH));
+        underTest.addElement(new Element(0, new Point(0, 0), Orientation.NORTH));
         underTest.draw(screenWriter);
         verifyScreen(screenWriter, "mapWithTile1");
     }
 
+    @Test
+    public void drawMapWithTwoElements() throws IOException {
+        underTest.addElement(new Element(0,new Point(0,0),Orientation.NORTH));
+        underTest.addElement(new Element(1,new Point(0,1),Orientation.NORTH));
+        underTest.draw(screenWriter);
+        verifyScreen(screenWriter, "mapWithTile1And2");
+    }
+
     private void verifyScreen(Screen screenWriter, String screenName) throws IOException {
         ArgumentCaptor<String> actualLine = ArgumentCaptor.forClass(String.class);
-        try (BufferedReader reader = new BufferedReader(new FileReader(getClass().getResource("/screens/" + screenName + ".screen").getFile()));) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(getClass().getResource("/screens/" + screenName + ".screen").getFile()))) {
             int lineNumber = 1;
             String expectedLine;
             while((expectedLine = reader.readLine())!=null) {
