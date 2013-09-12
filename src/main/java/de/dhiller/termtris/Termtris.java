@@ -1,13 +1,13 @@
 package de.dhiller.termtris;
 
 import com.googlecode.lanterna.TerminalFacade;
-import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.screen.ScreenCharacterStyle;
+import com.googlecode.lanterna.screen.ScreenWriter;
 import com.googlecode.lanterna.terminal.TerminalSize;
-import org.apache.log4j.BasicConfigurator;
+import de.dhiller.termtris.map.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.charset.Charset;
 
 /**
  * @author dhiller.
@@ -17,7 +17,8 @@ public class Termtris {
     private static final Logger LOGGER = LoggerFactory.getLogger(Termtris.class);
 
     private static Termtris termtris;
-    private Terminal terminal;
+    private Screen screen;
+    private Map map = new Map();
 
     public static void main(String[] args) throws InterruptedException {
         termtris = new Termtris();
@@ -27,26 +28,29 @@ public class Termtris {
 
     private void start() {
         LOGGER.info("Starting");
-        terminal = TerminalFacade.createTerminal();
-        terminal.enterPrivateMode();
-        TerminalSize screenSize = terminal.getTerminalSize();
+        screen = TerminalFacade.createScreen();
+        screen.startScreen();
+        TerminalSize screenSize = screen.getTerminalSize();
         LOGGER.info("Terminal screen size is {}x{}", screenSize.getColumns(), screenSize.getRows());
         LOGGER.info("Started");
 
-        terminal.setCursorVisible(true);
-        char[] chars = "Hello World!".toCharArray();
-        terminal.moveCursor(chars.length,0);
-        for (char c: chars) {
-            terminal.putCharacter(c);
+        map.draw(screen);
+        waitMSecs(5000);
+    }
+
+    private void waitMSecs(int timeout) {
+        synchronized (this) {
+            try {
+                this.wait(timeout);
+            } catch (InterruptedException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
         }
     }
 
     private void stop() throws InterruptedException {
-        synchronized (this) {
-            this.wait(5000);
-        }
         LOGGER.info("Stopping");
-        terminal.exitPrivateMode();
+        screen.stopScreen();
         LOGGER.info("Stopped");
     }
 }
