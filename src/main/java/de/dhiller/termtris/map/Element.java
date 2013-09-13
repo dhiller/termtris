@@ -2,6 +2,7 @@ package de.dhiller.termtris.map;
 
 import de.dhiller.termtris.tile.Tile;
 import de.dhiller.termtris.tile.TileFactory;
+import org.mockito.internal.util.collections.Sets;
 
 import java.awt.*;
 
@@ -66,6 +67,24 @@ public class Element implements Comparable<Element>{
     }
 
     String lineFromTile(int row) {
-        return tile().getLines().get(row- getCoordinate().x);
+        return tile().getLines().get(row - getCoordinate().y);
     }
+
+    public int width() {
+        return tile().getLines().get(0).length();
+    }
+
+    public int height() {
+        return tile().getLines().size();
+    }
+
+    public boolean collidesWith(Element that) {
+        int maxX = Math.max(getCoordinate().x, that.getCoordinate().x);
+        int maxWidth = Math.max(width(), that.width());
+        int maxY = Math.max(getCoordinate().y, that.getCoordinate().y);
+        int maxHeight = Math.max(height(), that.height());
+        Map.RawMapData rawMap = Map.createRawMap(Sets.newSet(this, that), maxX + maxWidth, maxY + maxHeight);
+        return !rawMap.getCollisions().isEmpty();
+    }
+
 }

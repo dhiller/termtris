@@ -79,9 +79,15 @@ public class MapTest {
     @Test
     public void drawMapWithTwoElements() throws IOException {
         underTest.addElement(new Element(0,new Point(0,0),Orientation.NORTH));
-        underTest.addElement(new Element(1,new Point(0,1),Orientation.NORTH));
+        underTest.addElement(new Element(1,new Point(1,0),Orientation.NORTH));
         underTest.draw(screenWriter);
         verifyScreen(screenWriter, "mapWithTile1And2");
+    }
+
+    @Test(expected = CollisionException.class)
+    public void addOnInvalidPosition() {
+        underTest.addElement(new Element(0,new Point(0,0),Orientation.NORTH));
+        underTest.addElement(new Element(1,new Point(0,0),Orientation.NORTH));
     }
 
     private void verifyScreen(Screen screenWriter, String screenName) throws IOException {
